@@ -4,6 +4,31 @@ import argparse
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+import time
+import heapq
+
+class Node:
+
+    def __init__(x_coord, y_coord, cost, parentID):
+
+        self.x = x_coord
+        self.y = y_coord
+        self.cost = cost
+        self.parentID = parentID
+
+def possible_steps():
+
+    steps_with_cost = np.array([
+                                [0, 1, 1],              # Move_up
+                                [1, 1, np.sqrt(2)],     # Move_right_top
+                                [1, 0, 1],              # Move_right
+                                [1, -1, np.sqrt(2)],    # Move_right_bottom
+                                [0, -1, 1],             # Move_down
+                                [-1, -1, np.sqrt(2)],   # Move_left_bottom
+                                [-1, 0, 1],             # Move_left
+                                [-1, 1, np.sqrt(2)]])   # Move_left_top
+
+    return steps_with_cost
 
 def generate_gui(width, height, radius):
 
@@ -55,24 +80,60 @@ def generate_gui(width, height, radius):
     plt.imshow(grid)
     plt.show()
 
+    return grid 
+
+def is_valid(point_x, point_y, grid, width, height):
+
+    if ( not grid[point_y][point_x]):
+        return True
+    if ((point_y < 0) or (point_x) < 0):
+        return True
+    if ((point_y > height) or (point_x > width)):
+        return True
+
+def path_search_algo(start_node, end_node, grid, width, height):
+
+    current_node = start_node
+    goal_node = end_node
+
+    if (current_node.x == goal_node.x) and (current_node.y == goal_node.y):
+        return 1
+
+    open_nodes = {}
+    open_nodes[start_node.x*width + start_node.y] = True
+    closed_nodes = {}
+    
+
+
 if __name__ == '__main__':
 
-    # Parser = argparse.ArgumentParser()
-    # Parser.add_argument('--start')
+    # Take input radius and clearance value
+    radius = input("Enter Robot radius: ")
+    clearance = input("Enter clearance value: ")
     radius = int(radius)
     clearance = int(clearance)
     gui_width = 300
     gui_height = 200
-    grid, obs_x, obs_y = generate_gui(gui_width, gui_height, radius+clearance)
+    grid = generate_gui(gui_width, gui_height, radius+clearance)
+
+    # Take start coordinates as input
     start_coord = input("Enter start coordinates: ")
-    end_coord = input("Enter end coordinates: ")
     start_x, start_y = start_coord.split()
     start_x = int(start_x)
     start_y = int(start_y)
-    if (is_obstacle(start_x, start_y)):
+    if (is_valid(start_x, start_y, grid, gui_width, gui_height)):
+        print("INVALID start node.")
+        exit(-1)
 
-    radius = input("Enter Robot radius: ")
-    clearance = input("Enter clearance value: ")
+    # Take end coordinates as input
+    end_coord = input("Enter end coordinates: ")
     end_x, end_y = end_coord.split()
     end_x = int(end_x)
     end_y = int(end_y)
+    if (is_valid(end_x, end_y, grid, gui_width, gui_height)):
+        print("INVALID end node.")
+        exit(-1)
+
+    start_node = Node(start_x, start_y, 0.0, -1)
+    end_node = Node(end_x, end_y, 0.0, -1)
+
