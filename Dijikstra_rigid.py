@@ -45,8 +45,8 @@ def generate_gui(width, height, radius):
     grid[y_coord > width - radius] = False
     # Obstacles:
     # Ellipse
-    ellipse = (40*(x_coord - 100))**2 + (20*(y_coord - 150))**2
-    grid[ellipse <= (40*20 + radius)**2] = False
+    ellipse = ((40+radius)*(x_coord - 100))**2 + ((20+radius)*(y_coord - 150))**2
+    grid[ellipse <= ((40+radius)*(20+radius))**2] = False
     
     # Circle
     circle = (x_coord - 150)**2 + (y_coord - 225)**2
@@ -224,8 +224,11 @@ if __name__ == '__main__':
 
     start_node = Node(start_x, start_y, 0.0, -1)
     end_node = Node(end_x, end_y, 0.0, -1)
+    start = time.time()
     flag, all_nodes = path_search_algo(start_node, end_node, grid, gui_width, gui_height)
-    # grid = generate_gui(gui_width, gui_height, 0)
+    end = time.time()
+    print("Time taken to find the path ", (end - start))
+    grid = generate_gui(gui_width, gui_height, 0)
     if (flag):
         find_path(start_node, end_node, gui_height, grid, all_nodes)
     else:
