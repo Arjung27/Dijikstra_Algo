@@ -172,33 +172,25 @@ def find_path(start_node, end_node, height, grid, all_nodes):
     print("Plotting........")
     x_coord.reverse()
     y_coord.reverse()
-    # fig, ax = plt.subplots()
-    # ax.set_ylim(0, height)
-    # ax.grid(True)
-    # plt.imshow(grid)
-    # # plt.show()
-    # # for i in range(len(all_nodes)):
-    # #     plt.scatter(all_nodes[i][0], all_nodes[i][1])
-    # #     plt.pause(0.05)
-    # plt.plot(all_nodes_x, all_nodes_y, 'b')
-    # plt.plot(x_coord, y_coord, 'r')
-    # plt.savefig("./plot.png")
-    # plt.show()
-    # plt.close()
-    video_writer = cv2.VideoWriter('./video.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 20, (200, 300))
-    # cv2.imshow("image", grid)
-    i = 0
-    while i < 1000:
-        video_writer.write(grid)
-        i += 1
-    # cv2.waitKey(0)
-    # for i in range(len(all_nodes)):
-    #     grid[int(all_nodes[i][1]), int(all_nodes[i][0])] = 200
-    #     grid[int(all_nodes[i][1]), int(all_nodes[i][0])].astype(np.uint8)
-    #     # cv2.imshow("image", grid)
-    #     video_writer.write(grid)
-    #     # cv2.waitKey(0)
-    video_writer.release()
+    grid = np.dstack([grid, grid, grid])
+    grid = cv2.flip(grid, 0)
+
+    for i in range(len(all_nodes)):
+        grid[201 - int(all_nodes[i][1]), int(all_nodes[i][0]), 0:3] = 200
+        grid[201 - int(all_nodes[i][1]), int(all_nodes[i][0]), 0:3].astype(np.uint8)
+        # print(grid.shape)
+        # exit(-1)
+        cv2.imshow("image", grid)
+        # video_writer.write(grid)
+        cv2.waitKey(1)
+
+    for i in range(len(x_coord)):
+
+        grid[201 - int(y_coord[i]), int(x_coord[i]), 0:3] = (255, 0,0)
+        grid[201 - int(y_coord[i]), int(x_coord[i]), 0:3].astype(np.uint8)
+        cv2.imshow("image", grid)
+        # video_writer.write(grid)
+    cv2.waitKey(0)
 
 
 if __name__ == '__main__':
@@ -233,6 +225,8 @@ if __name__ == '__main__':
     start_node = Node(start_x, start_y, 0.0, -1)
     end_node = Node(end_x, end_y, 0.0, -1)
     flag, all_nodes = path_search_algo(start_node, end_node, grid, gui_width, gui_height)
-
+    # grid = generate_gui(gui_width, gui_height, 0)
     if (flag):
         find_path(start_node, end_node, gui_height, grid, all_nodes)
+    else:
+        print("Path could not be found")
