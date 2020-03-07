@@ -9,12 +9,17 @@ import heapq
 
 class Node:
 
-    def __init__(x_coord, y_coord, cost, parentID):
+    def __init__(self, x_coord, y_coord, cost, parentID):
 
         self.x = x_coord
         self.y = y_coord
         self.cost = cost
         self.parentID = parentID
+
+    def __lt__(self,other):
+        return self.cost < other.cost
+    # def __eq__(self,other):
+    #     return self.cost == other.cost
 
 def possible_steps():
 
@@ -32,10 +37,8 @@ def possible_steps():
 
 def generate_gui(width, height, radius):
 
-    print(height)
-    x_coord, y_coord = np.mgrid[0:height, 0:width]
-    grid = np.full((height, width), True, dtype=bool)
-    print(grid.shape)
+    x_coord, y_coord = np.mgrid[0:height+2, 0:width+2]
+    grid = np.full((height+2, width+2), True, dtype=bool)
     grid[x_coord < radius] = False
     grid[x_coord > height - radius] = False
     grid[y_coord < radius] = False
@@ -71,39 +74,111 @@ def generate_gui(width, height, radius):
     l5 = x_coord + 1.2*y_coord - (210 - radius*np.sqrt(1 + 1.2**2))
     l6 = x_coord - 1*y_coord - (100 - radius*np.sqrt(1 + 1**2))
     grid[(l1 <= 0) & (l2 <= 0) & (l3 <= 0) & (l4 >= 0) & ((l5 >= 0) | (l6 >= 0))] = False
-    # cv2.imshow("image", grid)
-    # cv2.waitKey(0)
+    
     grid = grid.astype(np.uint8)*255
-    fig, ax = plt.subplots()
-    ax.set_ylim(0, height)
-    ax.grid(True)
-    plt.imshow(grid)
-    plt.show()
 
     return grid 
 
 def is_valid(point_x, point_y, grid, width, height):
 
-    if ( not grid[point_y][point_x]):
-        return True
+    # print(point_y, point_x)
+    # print(grid[point_y][point_x])
+
+    if ( not grid[int(point_y)][int(point_x)]):
+        return False
     if ((point_y < 0) or (point_x) < 0):
-        return True
+        return False
     if ((point_y > height) or (point_x > width)):
-        return True
+        return False
+    return True
+
+def is_goal(current, goal):
+
+    return (current.x == goal.x) and (current.y == goal.y)
 
 def path_search_algo(start_node, end_node, grid, width, height):
 
     current_node = start_node
     goal_node = end_node
+    steps_with_cost = possible_steps()
 
-    if (current_node.x == goal_node.x) and (current_node.y == goal_node.y):
+    if is_goal(current_node, goal_node):
         return 1
 
     open_nodes = {}
-    open_nodes[start_node.x*width + start_node.y] = True
+    open_nodes[start_node.x*width + start_node.y] = start_node
     closed_nodes = {}
-    
+    cost = []
+    heapq.heappush(cost, [start_node.cost, start_node])
 
+    while (len(cost) != 0):
+
+        current_node = heapq.heappop(cost)[1]
+        current_id = current_node.x*width + current_node.y
+        
+        if is_goal(current_node, end_node):
+            print(current_node.parentID, current_node.parentID.parentID)
+            end_node.parentID = current_node.parentID
+            end_node.cost = current_node.cost
+            print("Path found")
+            return 1
+
+        if current_id in closed_nodes:
+            continue
+        else:
+            closed_nodes[current_id] = current_node
+
+        del open_nodes[current_id]
+
+        for i in range(steps_with_cost.shape[0]):
+
+            new_node = Node(current_node.x + steps_with_cost[i][0], \
+                            current_node.y + steps_with_cost[i][1], \
+                            current_node.cost + steps_with_cost[i][2], \
+                            current_node)
+
+            new_node_id = new_node.x*width + new_node.y
+
+            if not is_valid(new_node.x, new_node.y, grid, width, height):
+                continue
+            elif new_node_id in closed_nodes:
+                continue
+
+            if new_node_id in open_nodes:
+                if new_node.cost < open_nodes[new_node_id].cost:
+                    open_nodes[new_node_id].cost = new_node.cost
+                    open_nodes[new_node_id].parentID = new_node.parentID
+            else:
+                open_nodes[new_node_id] = new_node
+
+            heapq.heappush(cost, [ open_nodes[new_node_id].cost, open_nodes[new_node_id]])
+
+    return 0
+
+def find_path(start_node, end_node, height, grid):
+
+    x_coord = [end_node.x]
+    y_coord = [end_node.y]
+
+    iD = end_node.parentID
+    while iD != -1:
+        # current_node = iD.parentID
+        x_coord.append(iD.x)
+        y_coord.append(iD.y)
+        iD = iD.parentID
+
+    print("Plotting........")
+    x_coord.reverse()
+    y_coord.reverse()
+    fig, ax = plt.subplots()
+    ax.set_ylim(0, height)
+    ax.grid(True)
+    plt.imshow(grid)
+    # plt.show()
+    plt.plot(x_coord, y_coord)
+    plt.savefig("./plot.png")
+    plt.show()
+    plt.close()
 
 if __name__ == '__main__':
 
@@ -121,7 +196,7 @@ if __name__ == '__main__':
     start_x, start_y = start_coord.split()
     start_x = int(start_x)
     start_y = int(start_y)
-    if (is_valid(start_x, start_y, grid, gui_width, gui_height)):
+    if not is_valid(start_x, start_y, grid, gui_width, gui_height):
         print("INVALID start node.")
         exit(-1)
 
@@ -130,10 +205,12 @@ if __name__ == '__main__':
     end_x, end_y = end_coord.split()
     end_x = int(end_x)
     end_y = int(end_y)
-    if (is_valid(end_x, end_y, grid, gui_width, gui_height)):
+    if (not is_valid(end_x, end_y, grid, gui_width, gui_height)):
         print("INVALID end node.")
         exit(-1)
 
     start_node = Node(start_x, start_y, 0.0, -1)
     end_node = Node(end_x, end_y, 0.0, -1)
 
+    if (path_search_algo(start_node, end_node, grid, gui_width, gui_height)):
+        find_path(start_node, end_node, gui_height, grid)
