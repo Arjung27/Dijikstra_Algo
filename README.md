@@ -25,5 +25,7 @@ Enter the end Point:
 ```
 
 ### Notes
-Run Time for sample input (5,5) and (295, 195) Point robot case: 14.722118854522705 (To find the path)
+```
+Run Time for sample input (5,5) and (295, 195) Point robot case: 14.722118854522705 (To find the path) 
 Run Time for sample input (5,5) and (295, 195) Rigid robot case: 8.693345069885254 (To find the path)
+```
