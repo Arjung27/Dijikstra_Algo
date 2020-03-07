@@ -185,16 +185,19 @@ def find_path(start_node, end_node, height, grid, all_nodes):
     # plt.savefig("./plot.png")
     # plt.show()
     # plt.close()
-    video_writer = cv2.VideoWriter('./video.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 20, (300, 200))
+    video_writer = cv2.VideoWriter('./video.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 20, (200, 300))
     # cv2.imshow("image", grid)
-    video_writer.write(grid)
-    # cv2.waitKey(0)
-    for i in range(len(all_nodes)):
-        grid[int(all_nodes[i][1]), int(all_nodes[i][0])] = 200
-        grid[int(all_nodes[i][1]), int(all_nodes[i][0])].astype(np.uint8)
-        # cv2.imshow("image", grid)
+    i = 0
+    while i < 1000:
         video_writer.write(grid)
-        # cv2.waitKey(0)
+        i += 1
+    # cv2.waitKey(0)
+    # for i in range(len(all_nodes)):
+    #     grid[int(all_nodes[i][1]), int(all_nodes[i][0])] = 200
+    #     grid[int(all_nodes[i][1]), int(all_nodes[i][0])].astype(np.uint8)
+    #     # cv2.imshow("image", grid)
+    #     video_writer.write(grid)
+    #     # cv2.waitKey(0)
     video_writer.release()
 
 
