@@ -1,6 +1,15 @@
 # Dijikstra_Algo
 Implementing Dijikstra Algorithm on a map
 
+## Dependencies
+```
+python3.5
+Ubuntu 16.04
+OpenCV 3.4.9
+matplotlib
+numpy
+```
+
 ## Running the code
 
 For point robot, run  
