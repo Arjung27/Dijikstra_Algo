@@ -228,6 +228,7 @@ if __name__ == '__main__':
     flag, all_nodes = path_search_algo(start_node, end_node, grid, gui_width, gui_height)
     end = time.time()
     print("Time taken to find the path ", (end - start))
+    grid = generate_gui(gui_width, gui_height, 0)
     if (flag):
         find_path(start_node, end_node, gui_height, grid, all_nodes)
     else:
