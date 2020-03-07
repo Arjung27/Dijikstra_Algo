@@ -33,8 +33,18 @@ Enter the start Point:
 Enter the end Point: 
 ```
 
-### Notes
+## Notes
 ```
 Run Time for sample input (5,5) and (295, 195) Point robot case: 14.722118854522705 (To find the path) 
 Run Time for sample input (5,5) and (295, 195) Rigid robot case: 8.693345069885254 (To find the path)
 ```
+
+## Results
+
+Dijkstra Point robot result:
+
+![Point Robot](dijikstra_point.png)
+
+Dijkstra Rigid robot result with radius and clearance values as 5:
+
+![Rigid Robot](dijikstra_rigid.png)
